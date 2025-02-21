@@ -1,0 +1,26 @@
+name: Format
+on: [ push, pull_request ]
+jobs:
+    Format:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                shell: bash
+        steps:
+            -   uses: actions/checkout@v4
+            -   name: Install uv
+                uses: astral-sh/setup-uv@v5
+                with:
+                    version: "0.6.2"
+            -   uses: actions/setup-python@v5
+                with:
+                    python-version: '3.13'
+            -   name: Version Check
+                run: |
+                    python --version
+                    uv --version
+            -   name: Install the project
+                run: uv sync --all-extras --dev
+            -   name: Check Formatting
+                run: |
+                    uv run task format-check

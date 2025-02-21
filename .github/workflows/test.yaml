@@ -1,0 +1,32 @@
+name: Test
+on: [ push, pull_request ]
+jobs:
+    Test:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [ macos-latest, ubuntu-latest, windows-latest ]
+        defaults:
+            run:
+                shell: bash
+        steps:
+            -   uses: actions/checkout@v4
+            -   name: Install uv
+                uses: astral-sh/setup-uv@v5
+                with:
+                    version: "0.6.2"
+            -   uses: actions/setup-python@v5
+                with:
+                    python-version: '3.13'
+            -   name: Version Check
+                run: |
+                    python --version
+                    uv --version
+            -   name: Install the project
+                run: |
+                    uv sync --all-extras --dev
+                    uv add --dev codecov
+            -   name: Run Tests
+                run: |
+                    uv run task test
+                    uv run codecov
